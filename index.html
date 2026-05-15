@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flashcard Quiz</title>
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+  <!-- CSS File -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app-shell" style="position:relative">
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon"><i class="ti ti-cards"></i></div>
+    <div>
+      <div class="header-title">Flashcard Quiz</div>
+      <div class="header-sub">Study smarter, not harder</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:6px">
+    <button class="btn" onclick="shuffleCards()">
+      <i class="ti ti-arrows-shuffle"></i>
+    </button>
+
+    <button class="btn" onclick="resetProgress()">
+      <i class="ti ti-refresh"></i>
+    </button>
+  </div>
+</div>
+
+<div class="cat-strip" id="catStrip"></div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-label">Total</div>
+    <div class="stat-val purple" id="statTotal">0</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Known</div>
+    <div class="stat-val green" id="statKnown">0</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Remaining</div>
+    <div class="stat-val" id="statLeft">0</div>
+  </div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+
+  <div class="progress-meta">
+    <span id="progLabel">0 of 0 mastered</span>
+    <span id="progPct">0%</span>
+  </div>
+</div>
+
+<div class="dots-row" id="dotsRow"></div>
+
+<div class="card-scene">
+  <div class="card-3d" id="cardEl" onclick="flipCard()">
+
+    <div class="card-face">
+
+      <span class="card-cat-badge" id="catBadge">General</span>
+
+      <span class="card-num" id="cardNum">1 / 1</span>
+
+      <div class="card-side-label">Question</div>
+
+      <div class="card-q" id="frontText">
+        Add your first card below!
+      </div>
+
+      <div class="card-tap-hint">
+        <i class="ti ti-hand-click"></i>
+        Tap to reveal answer
+      </div>
+
+    </div>
+
+    <div class="card-face card-back-face">
+
+      <span class="card-cat-badge" id="catBadgeBack">
+        General
+      </span>
+
+      <div class="card-side-label">Answer</div>
+
+      <div class="card-a" id="backText">—</div>
+
+    </div>
+
+  </div>
+</div>
+
+<div class="action-row">
+
+  <div class="nav-cluster">
+
+    <button class="btn" id="prevBtn" onclick="navigate(-1)">
+      <i class="ti ti-chevron-left"></i> Prev
+    </button>
+
+    <span class="counter-badge" id="counterText">0 / 0</span>
+
+    <button class="btn" id="nextBtn" onclick="navigate(1)">
+      Next <i class="ti ti-chevron-right"></i>
+    </button>
+
+  </div>
+
+  <div style="display:flex;gap:8px">
+
+    <button class="btn btn-primary" onclick="flipCard()">
+      <i class="ti ti-eye"></i> Show
+    </button>
+
+    <button class="btn btn-known" id="knownBtn"
+    onclick="toggleKnown()">
+      <i class="ti ti-check"></i> Known
+    </button>
+
+  </div>
+
+</div>
+
+<!-- ADD FLASHCARD PANEL -->
+
+<div class="panel">
+
+  <div class="panel-hdr"
+  onclick="togglePanel('addPanel','addChevron','addToggleTxt')">
+
+    <div class="panel-title">
+      <i class="ti ti-plus"></i>
+      <span id="addPanelTitle">Add flashcard</span>
+    </div>
+
+    <div class="panel-toggle">
+      <span id="addToggleTxt">Show</span>
+      <i class="ti ti-chevron-down" id="addChevron"></i>
+    </div>
+
+  </div>
+
+  <div class="panel-body" id="addPanel" style="display:none">
+
+    <div class="form-grid">
+
+      <div class="form-field">
+        <label>Category</label>
+
+        <select id="inputCat">
+
+          <option value="science">Science</option>
+          <option value="history">History</option>
+          <option value="technology">Technology</option>
+          <option value="biology">Biology</option>
+          <option value="math">Math</option>
+
+        </select>
+      </div>
+
+      <div class="form-field">
+
+        <label>Question</label>
+
+        <input type="text"
+        id="inputQ"
+        placeholder="Enter question">
+
+      </div>
+
+      <div class="form-field">
+
+        <label>Answer</label>
+
+        <textarea id="inputA"
+        placeholder="Enter answer"></textarea>
+
+      </div>
+
+      <div class="form-actions">
+
+        <button class="btn-save"
+        onclick="saveCard()">
+
+          <i class="ti ti-device-floppy"></i>
+          Add Card
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ALL CARDS PANEL -->
+
+<div class="panel">
+
+  <div class="panel-hdr"
+  onclick="togglePanel('listPanel','listChevron','listToggleTxt')">
+
+    <div class="panel-title">
+
+      <i class="ti ti-list"></i>
+
+      All cards
+
+      <span id="listCount">(0)</span>
+
+    </div>
+
+    <div class="panel-toggle">
+
+      <span id="listToggleTxt">Show</span>
+
+      <i class="ti ti-chevron-down"
+      id="listChevron"></i>
+
+    </div>
+
+  </div>
+
+  <div class="panel-body"
+  id="listPanel"
+  style="display:none">
+
+    <div class="cards-list"
+    id="cardsList"></div>
+
+  </div>
+
+</div>
+
+<!-- JS FILE -->
+<script src="script.js"></script>
+
+</body>
+</html>
